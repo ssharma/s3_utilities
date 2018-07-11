@@ -75,17 +75,10 @@ def restore_folder(bucket_name, prefix):
     """
     restores all contents in a single directory of a bucket
     """
-    versions = []
-    count = 0
     bucket = conn.get_bucket(bucket_name)
-    for version in bucket.list_versions():
-        versions.append(version)
-    for version in versions:
-        count += 1
+    for version in bucket.list_versions(prefix=prefix):
         if isinstance(version, deletemarker.DeleteMarker) and version.is_latest:
-            key = versions[count]
-            if key.key.startswith(prefix):
-                bucket.delete_key(version.name, version_id=version.version_id)
+            bucket.delete_key(version.name, version_id=version.version_id)
     print('Folder \'{}\' restored from \'{}\'.'.format(prefix, bucket_name))
 
 
